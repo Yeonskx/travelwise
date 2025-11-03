@@ -33,7 +33,7 @@ if st.session_state["logged_in"]:
     if st.sidebar.button("Logout"):
         st.session_state["logged_in"] = False
         st.session_state["user"] = {}
-        st.experimental_rerun()
+        st.rerun()
 else:
     st.sidebar.info("🔑 Please log in to access all features.")
 

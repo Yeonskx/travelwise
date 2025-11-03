@@ -54,6 +54,38 @@ def save_conversation(name, chat_history):
     conn.commit()
     conn.close()
 
+def get_destination_info(destination):
+    """Fetch basic information about the destination using Gemini."""
+    if not destination or destination.strip() == "":
+        return None
+    
+    prompt = f"""
+    Provide a brief overview of {destination} as a travel destination in 2-3 sentences.
+    Include key highlights like popular attractions, best time to visit, or cultural aspects.
+    Keep it concise and engaging.
+    """
+    try:
+        response = model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        return f"Unable to fetch destination info: {e}"
+
+def auto_suggest_itinerary(destination, trip_date):
+    """Generate an automatic conversation starter based on destination and date."""
+    if not destination or destination.strip() == "":
+        return None
+    
+    prompt = f"""
+    Create a brief, friendly greeting for a traveler planning to visit {destination} on {trip_date}.
+    Suggest 2-3 things they should consider or plan for this trip.
+    Keep it conversational and helpful, in 3-4 sentences.
+    """
+    try:
+        response = model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        return None
+
 init_db()
 
 # --- UI HEADER ---
@@ -64,14 +96,41 @@ st.write("Chat with your AI travel planner to plan your next adventure — power
 destination = st.text_input("Destination Country", placeholder="e.g., Japan, France, Canada")
 trip_date = st.date_input("Trip Date", date.today())
 
+# Show destination info when destination is entered
+if destination and destination.strip():
+    with st.expander("ℹ️ About " + destination, expanded=False):
+        with st.spinner("Loading destination info..."):
+            dest_info = get_destination_info(destination)
+            if dest_info:
+                st.info(dest_info)
+    
+    # Button to generate itinerary suggestions
+    if st.button("💡 Get Travel Tips for " + destination):
+        with st.spinner("Generating personalized tips..."):
+            suggestions = auto_suggest_itinerary(destination, trip_date)
+            if suggestions:
+                st.success(suggestions)
+                # Optionally add to chat history
+                if f"chat_history_{user_email}" in st.session_state:
+                    st.session_state[f"chat_history_{user_email}"].append({
+                        "role": "assistant",
+                        "content": suggestions
+                    })
+
 # --- AI CONTEXT ---
-system_instruction = """
+system_instruction = f"""
 You are TravelWise — a travel assistant AI.
 Only discuss travel-related topics:
 - Trip planning, itineraries, and destinations
 - Budgeting and expenses
 - Flights, transportation, and accommodations
 - Food, culture, and local activities
+
+Current trip context:
+- Destination: {destination if destination else 'Not specified'}
+- Trip Date: {trip_date.strftime('%Y-%m-%d')}
+
+Use this context when relevant to personalize your responses.
 If asked something unrelated to travel, politely refuse.
 """
 
@@ -117,7 +176,9 @@ if user_input:
         with st.chat_message("assistant"):
             with st.spinner("Thinking... ✈️"):
                 try:
-                    response = chat_session.send_message(user_input)
+                    # Update system instruction with current trip context
+                    updated_prompt = f"{user_input}\n\nContext: Planning trip to {destination if destination else 'a destination'} on {trip_date.strftime('%Y-%m-%d')}"
+                    response = chat_session.send_message(updated_prompt)
                     bot_reply = response.text
                     st.markdown(bot_reply)
                     chat_history.append({"role": "assistant", "content": bot_reply})
@@ -130,7 +191,7 @@ if user_input:
 
     else:
         bot_reply = (
-            "🌍 I’m your **AI Travel Assistant**, so I can only help with travel-related topics — "
+            "🌍 I'm your **AI Travel Assistant**, so I can only help with travel-related topics — "
             "like trip planning, destinations, budgeting, and experiences. Try asking me about your next adventure! ✈️"
         )
         st.chat_message("assistant").markdown(bot_reply)
@@ -141,4 +202,4 @@ st.sidebar.markdown(f"👋 **{user['firstname']} {user['lastname']}**")
 if st.sidebar.button("Logout"):
     st.session_state["logged_in"] = False
     st.session_state["user"] = {}
-    st.experimental_rerun()
+    st.rerun()

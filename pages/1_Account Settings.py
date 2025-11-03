@@ -140,7 +140,7 @@ if st.session_state["logged_in"] and st.session_state["user"]["role"] == "admin"
             else:
                 delete_user(email_to_delete)
                 st.success(f"✅ User '{email_to_delete}' has been deleted.")
-                st.experimental_rerun()
+                st.rerun()
 
 # --- SIDEBAR LOGOUT ---
 if st.session_state["logged_in"]:
@@ -149,4 +149,4 @@ if st.session_state["logged_in"]:
     if st.sidebar.button("Logout"):
         st.session_state["logged_in"] = False
         st.session_state["user"] = {}
-        st.experimental_rerun()
+        st.rerun()

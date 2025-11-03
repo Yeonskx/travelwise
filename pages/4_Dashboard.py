@@ -90,19 +90,19 @@ if "duration_days" not in st.session_state:
 
 # --- SIDEBAR: TRIP CONFIGURATION ---
 with st.sidebar:
-    st.markdown("### 🎯 Trip Configuration")
+    st.markdown("Trip Configuration")
     
     st.session_state.destination_country = st.selectbox(
-        "🌍 Destination", 
+        "Destination", 
         ["Japan", "Korea", "Singapore", "Thailand", "USA", "France", "Italy", "Australia"],
         index=0
     )
     
     col_curr1, col_curr2 = st.columns(2)
     with col_curr1:
-        st.session_state.home_currency = st.selectbox("Home 💰", ["PHP", "USD", "EUR", "JPY", "KRW"])
+        st.session_state.home_currency = st.selectbox("Home", ["PHP", "USD", "EUR", "JPY", "KRW"])
     with col_curr2:
-        st.session_state.destination_currency = st.selectbox("Dest 💰", ["JPY", "KRW", "SGD", "THB", "USD", "EUR"])
+        st.session_state.destination_currency = st.selectbox("Dest", ["JPY", "KRW", "SGD", "THB", "USD", "EUR"])
     
     st.session_state.total_budget = st.number_input(
         "💵 Total Budget", 
@@ -136,28 +136,28 @@ metric_col1, metric_col2, metric_col3, metric_col4 = st.columns(4)
 
 with metric_col1:
     st.metric(
-        label="💰 Total Budget",
+        label="Total Budget",
         value=f"₱{total_budget:,.0f}",
         delta=None
     )
 
 with metric_col2:
     st.metric(
-        label="📅 Trip Duration",
+        label="Trip Duration",
         value=f"{duration_days} days",
         delta=None
     )
 
 with metric_col3:
     st.metric(
-        label="💵 Daily Allowance",
+        label="Daily Allowance",
         value=f"₱{daily_allowance:,.0f}",
         delta=None
     )
 
 with metric_col4:
     st.metric(
-        label="🌍 Destination",
+        label="Destination",
         value=st.session_state.destination_country,
         delta=None
     )
@@ -172,11 +172,11 @@ with left_col:
     st.markdown('<p class="section-title">💰 Budget Allocation</p>', unsafe_allow_html=True)
     
     categories = [
-        ("🏨 Accommodation", "accommodation"),
-        ("🍜 Food & Dining", "food"),
-        ("🚗 Transportation", "transport"),
-        ("🛍️ Shopping", "shopping"),
-        ("✨ Miscellaneous", "misc")
+        ("Accommodation", "accommodation"),
+        ("Food & Dining", "food"),
+        ("Transportation", "transport"),
+        ("Shopping", "shopping"),
+        ("Miscellaneous", "misc")
     ]
     
     allocations = {}
@@ -199,17 +199,17 @@ with left_col:
     # Budget status
     budget_col1, budget_col2 = st.columns(2)
     with budget_col1:
-        st.metric("✅ Total Allocated", f"₱{total_allocated:,.0f}")
+        st.metric("Total Allocated", f"₱{total_allocated:,.0f}")
     with budget_col2:
         if remaining_budget < 0:
-            st.metric("⚠️ Over Budget", f"₱{abs(remaining_budget):,.0f}", delta=f"-₱{abs(remaining_budget):,.0f}", delta_color="inverse")
+            st.metric("Over Budget", f"₱{abs(remaining_budget):,.0f}", delta=f"-₱{abs(remaining_budget):,.0f}", delta_color="inverse")
         else:
-            st.metric("💡 Remaining", f"₱{remaining_budget:,.0f}", delta=f"₱{remaining_budget:,.0f}")
+            st.metric("Remaining", f"₱{remaining_budget:,.0f}", delta=f"₱{remaining_budget:,.0f}")
     
     st.divider()
     
     # --- PIE CHART ---
-    st.markdown('<p class="section-title">📊 Spending Distribution</p>', unsafe_allow_html=True)
+    st.markdown('<p class="section-title">Spending Distribution</p>', unsafe_allow_html=True)
     
     alloc_df = pd.DataFrame(list(allocations.items()), columns=["Category", "Amount"])
     alloc_df = alloc_df[alloc_df["Amount"] > 0]  # Only show allocated categories
@@ -234,7 +234,7 @@ with left_col:
 
 with right_col:
     # --- ALLOCATION TABLE ---
-    st.markdown('<p class="section-title">📋 Allocation Breakdown</p>', unsafe_allow_html=True)
+    st.markdown('<p class="section-title">Allocation Breakdown</p>', unsafe_allow_html=True)
     
     if not alloc_df.empty:
         alloc_df["Percentage"] = round((alloc_df["Amount"] / total_budget) * 100, 1)
@@ -253,7 +253,7 @@ with right_col:
     st.divider()
     
     # --- DAILY VS REMAINING ---
-    st.markdown('<p class="section-title">💵 Daily Budget Analysis</p>', unsafe_allow_html=True)
+    st.markdown('<p class="section-title">Daily Budget Analysis</p>', unsafe_allow_html=True)
     
     chart_df = pd.DataFrame({
         "Category": ["Daily Allowance", "Remaining Budget"],
@@ -343,25 +343,25 @@ summary_col1, summary_col2, summary_col3 = st.columns(3)
 
 with summary_col1:
     st.markdown(f"""
-    **🌍 Destination**  
+    **Destination**  
     {st.session_state.destination_country} ({st.session_state.destination_currency})
     
-    **💰 Home Currency**  
+    **Home Currency**  
     {st.session_state.home_currency}
     """)
 
 with summary_col2:
     st.markdown(f"""
-    **💵 Total Budget**  
+    **Total Budget**  
     ₱{total_budget:,.0f}
     
-    **📅 Duration**  
+    **Duration**  
     {duration_days} days
     """)
 
 with summary_col3:
     st.markdown(f"""
-    **💳 Daily Allowance**  
+    **Daily Allowance**  
     ₱{daily_allowance:,.0f}
     
     **✅ Status**  

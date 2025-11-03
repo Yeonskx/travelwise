@@ -74,21 +74,39 @@ with tab1:
                 st.error("Invalid credentials")
 
 # ==================== SIGN UP ====================
+# ==================== SIGN UP ====================
 with tab2:
     st.subheader("Create account")
 
+    # --- Responsive form layout ---
+    st.markdown("""
+    <style>
+        @media (max-width: 768px) {
+            /* Stack the Streamlit columns vertically */
+            div[data-testid="column"] {
+                width: 100% !important;
+                flex: 1 1 100% !important;
+                display: block;
+            }
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # Two columns for desktop, stacked automatically on mobile
     col1, col2 = st.columns(2)
+
     with col1:
         firstname = st.text_input("First Name")
-        email_signup = st.text_input("Email", key="signup_email")
-        password_signup = st.text_input("Password", type="password", key="signup_password")
-    with col2:
         lastname = st.text_input("Last Name")
         country = st.text_input("Country")
+
+    with col2:
+        email_signup = st.text_input("Email", key="signup_email")
+        password_signup = st.text_input("Password", type="password", key="signup_password")
         confirm_password = st.text_input("Confirm Password", type="password")
 
     if st.button("Sign Up", key="signup_btn"):
-        if not all([firstname, lastname, email_signup, country, password_signup]):
+        if not all([firstname, lastname, email_signup, country, password_signup, confirm_password]):
             st.warning("Please fill in all fields")
         elif password_signup != confirm_password:
             st.error("Passwords don't match")
@@ -97,6 +115,7 @@ with tab2:
         else:
             add_user(email_signup, password_signup, firstname, lastname, country)
             st.success("Account created! You can now log in.")
+
 
 # ==================== INLINE ADMIN DASHBOARD ====================
 if st.session_state["logged_in"] and st.session_state["user"]["role"] == "admin":

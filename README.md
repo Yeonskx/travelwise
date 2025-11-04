@@ -47,7 +47,7 @@ travelwise/
 │ ├── 5_AI Chatbot.py
 │ └── 6_Chat History.py
 ├── utils/ # Helper functions
-├── venv/ # Virtual environment (not pushed to Git)
+├── venv/ # Virtual environment
 ├── Home.py # Main Streamlit entry point
 ├── requirements.txt # Dependencies
 └── README.md # Project documentation

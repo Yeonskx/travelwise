@@ -32,6 +32,7 @@ It helps users plan their trips efficiently — manage expenses, convert currenc
 
 ## 📁 Folder Structure
 
+```
 travelwise/
 │
 ├── assets/ # Static assets (images, icons, etc.)
@@ -50,3 +51,4 @@ travelwise/
 ├── Home.py # Main Streamlit entry point
 ├── requirements.txt # Dependencies
 └── README.md # Project documentation
+```

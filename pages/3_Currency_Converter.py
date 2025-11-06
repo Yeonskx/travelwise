@@ -1,13 +1,43 @@
 import streamlit as st
 from utils.currency_api import get_exchange_rate
 
+# Initialize session state
+if "logged_in" not in st.session_state:
+    st.session_state["logged_in"] = False
+
+    
+# --------------------------
+# PAGE CONFIGURATION
+# --------------------------
+st.set_page_config(page_title="Currency Converter", layout="centered")
+
+# Hide pages function
+def hide_pages_when_not_logged_in():
+    is_logged_in = st.session_state.get('logged_in', False)
+    
+    if not is_logged_in:
+        hide_pages_css = """
+        <style>
+            [data-testid="stSidebarNav"] li:nth-child(3),
+            [data-testid="stSidebarNav"] li:nth-child(4),
+            [data-testid="stSidebarNav"] li:nth-child(5),
+            [data-testid="stSidebarNav"] li:nth-child(6),
+            [data-testid="stSidebarNav"] li:nth-child(7) {
+                display: none;
+            }
+        </style>
+        """
+        st.markdown(hide_pages_css, unsafe_allow_html=True)
+
+hide_pages_when_not_logged_in()
+
+
 # --- LOGIN PROTECTION ---
 if "logged_in" not in st.session_state or not st.session_state["logged_in"]:
     st.warning("⚠️ Please log in or create an account to access this page.")
     st.stop()  # stops execution of the rest of the page
 
-st.set_page_config(page_title="Currency Converter", page_icon="💱")
-st.title("💱 Currency Converter")
+st.title("Currency Converter")
 st.write("Convert one currency to another using live exchange rates.")
 
 # --- Initialize session state for currencies if not exists ---
@@ -61,6 +91,28 @@ if st.button("Convert", type="primary"):
         st.caption(f"Exchange Rate: 1 {base_currency} = {rate:.4f} {target_currency}")
     else:
         st.error("⚠️ Could not fetch the exchange rate. Please check your internet connection or currency codes.")
+
+with st.sidebar.expander("How Currency Converter Works", expanded=True):
+    st.markdown("""
+    The **Currency Converter** allows travelers to easily convert between popular
+    global currencies using **live exchange rates**.
+
+    **How to use it:**
+    1. **Select Currencies:**  
+       Choose your base and target currencies from the dropdown menus.  
+       You can also click the **⇄** button to swap them instantly.
+
+    2. **Enter an Amount:**  
+       Type how much you want to convert whether it’s a few dollars or a full budget.
+
+    3. **View Conversion Results:**  
+       Click **Convert** to display the converted amount and current exchange rate.
+
+    4. **Stay Updated:**  
+       Rates are fetched live through the TravelWise **Currency API**, ensuring you
+       always get the most recent conversion values.
+    """)
+
 
 # --- SIDEBAR LOGOUT ---
 if st.session_state["logged_in"]:

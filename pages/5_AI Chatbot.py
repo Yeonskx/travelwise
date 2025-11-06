@@ -7,10 +7,32 @@ import json
 from datetime import date
 from pathlib import Path
 
-DB_PATH = Path("database/chathistory.db")
+# Initialize session state
+if "logged_in" not in st.session_state:
+    st.session_state["logged_in"] = False
 
-# --- PAGE CONFIG ---
-st.set_page_config(page_title="AI Travel Chatbot 🌏", page_icon="🧳", layout="centered")
+# Hide pages function
+def hide_pages_when_not_logged_in():
+    is_logged_in = st.session_state.get('logged_in', False)
+    
+    if not is_logged_in:
+        hide_pages_css = """
+        <style>
+            [data-testid="stSidebarNav"] li:nth-child(3),
+            [data-testid="stSidebarNav"] li:nth-child(4),
+            [data-testid="stSidebarNav"] li:nth-child(5),
+            [data-testid="stSidebarNav"] li:nth-child(6),
+            [data-testid="stSidebarNav"] li:nth-child(7) {
+                display: none;
+            }
+        </style>
+        """
+        st.markdown(hide_pages_css, unsafe_allow_html=True)
+
+hide_pages_when_not_logged_in()
+
+
+DB_PATH = Path("database/chathistory.db")
 
 # --- LOGIN PROTECTION ---
 if "logged_in" not in st.session_state or not st.session_state["logged_in"]:

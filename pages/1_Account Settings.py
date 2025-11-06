@@ -4,15 +4,33 @@ import pandas as pd
 import sqlite3
 import time
 
+# Initialize session state
+if "logged_in" not in st.session_state:
+    st.session_state["logged_in"] = False
+
+# Hide pages function
+def hide_pages_when_not_logged_in():
+    is_logged_in = st.session_state.get('logged_in', False)
+    
+    if not is_logged_in:
+        hide_pages_css = """
+        <style>
+            [data-testid="stSidebarNav"] li:nth-child(3),
+            [data-testid="stSidebarNav"] li:nth-child(4),
+            [data-testid="stSidebarNav"] li:nth-child(5),
+            [data-testid="stSidebarNav"] li:nth-child(6),
+            [data-testid="stSidebarNav"] li:nth-child(7) {
+                display: none;
+            }
+        </style>
+        """
+        st.markdown(hide_pages_css, unsafe_allow_html=True)
+
+hide_pages_when_not_logged_in()
+
+
 # --- Initialize database ---
 init_db()
-
-# --- PAGE CONFIG ---
-st.set_page_config(
-    page_title="TravelWise | Login",
-    page_icon="✈️",
-    layout="centered"
-)
 
 # --- Basic CSS ---
 st.markdown("""
@@ -73,7 +91,6 @@ with tab1:
             else:
                 st.error("Invalid credentials")
 
-# ==================== SIGN UP ====================
 # ==================== SIGN UP ====================
 with tab2:
     st.subheader("Create account")
@@ -160,6 +177,14 @@ if st.session_state["logged_in"] and st.session_state["user"]["role"] == "admin"
                 delete_user(email_to_delete)
                 st.success(f"✅ User '{email_to_delete}' has been deleted.")
                 st.rerun()
+
+
+with st.sidebar.expander("About TravelWise", expanded=True):
+    st.write(
+        "TravelWise is an AI-powered travel planner that helps users design smarter itineraries, "
+        "manage budgets, and explore destinations effortlessly. Its mission is to make travel "
+        "planning simple, personalized, and stress-free."
+    )
 
 # --- SIDEBAR LOGOUT ---
 if st.session_state["logged_in"]:

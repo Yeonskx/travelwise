@@ -3,10 +3,32 @@ import sqlite3
 import json
 from pathlib import Path
 
-DB_PATH = Path("database/chathistory.db")
+# Initialize session state
+if "logged_in" not in st.session_state:
+    st.session_state["logged_in"] = False
 
-# --- PAGE CONFIG ---
-st.set_page_config(page_title="💬 Saved Conversations", page_icon="💾", layout="centered")
+# Hide pages function
+def hide_pages_when_not_logged_in():
+    is_logged_in = st.session_state.get('logged_in', False)
+    
+    if not is_logged_in:
+        hide_pages_css = """
+        <style>
+            [data-testid="stSidebarNav"] li:nth-child(3),
+            [data-testid="stSidebarNav"] li:nth-child(4),
+            [data-testid="stSidebarNav"] li:nth-child(5),
+            [data-testid="stSidebarNav"] li:nth-child(6),
+            [data-testid="stSidebarNav"] li:nth-child(7) {
+                display: none;
+            }
+        </style>
+        """
+        st.markdown(hide_pages_css, unsafe_allow_html=True)
+
+hide_pages_when_not_logged_in()
+
+
+DB_PATH = Path("database/chathistory.db")
 
 # --- LOGIN PROTECTION ---
 if "logged_in" not in st.session_state or not st.session_state["logged_in"]:
@@ -16,7 +38,7 @@ if "logged_in" not in st.session_state or not st.session_state["logged_in"]:
 user = st.session_state["user"]
 user_email = user["email"]
 
-st.title("💬 Saved Conversations")
+st.title("Saved Conversations")
 st.caption("Browse your previous AI-assisted trip planning chats — or delete old ones.")
 
 # --- DATABASE SETUP ---
@@ -64,7 +86,7 @@ else:
     for convo_id, name, chat_json in convos:
         col1, col2 = st.columns([8, 1])
         with col1:
-            expander = st.expander(f"🗓️ {name}", expanded=False)
+            expander = st.expander(f"{name}", expanded=False)
         with col2:
             if st.button("🗑️", key=f"del_{convo_id}", help="Delete this conversation"):
                 delete_conversation(convo_id, user_email)
@@ -76,9 +98,9 @@ else:
             chat = json.loads(chat_json)
             for msg in chat:
                 if msg["role"] == "user":
-                    st.markdown(f"**🧑 You:** {msg['content']}**")
+                    st.markdown(f"**You:** {msg['content']}**")
                 else:
-                    st.markdown(f"**🤖 AI:** {msg['content']}**")
+                    st.markdown(f"**AI:** {msg['content']}**")
 
 # --- SIDEBAR (Logout) ---
 st.sidebar.markdown(f"👋 **{user['firstname']} {user['lastname']}**")

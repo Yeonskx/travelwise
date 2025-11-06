@@ -1,6 +1,6 @@
 import streamlit as st
 
-# --- PAGE CONFIG ---
+# --- PAGE CONFIG (MUST BE FIRST) ---
 st.set_page_config(page_title="TravelWise", page_icon="🌍", layout="wide")
 
 # --- SESSION DEFAULTS ---
@@ -8,6 +8,32 @@ if "logged_in" not in st.session_state:
     st.session_state["logged_in"] = False
 if "user" not in st.session_state:
     st.session_state["user"] = {}
+
+# Hide pages when not logged in
+def hide_pages_when_not_logged_in():
+    """Hide specific pages from sidebar when user is not logged in"""
+    
+    # Check login status
+    is_logged_in = st.session_state.get('logged_in', False)
+    
+    if not is_logged_in:
+        # Hide these pages when not logged in
+        hide_pages_css = """
+        <style>
+            [data-testid="stSidebarNav"] li:nth-child(3),
+            [data-testid="stSidebarNav"] li:nth-child(4),
+            [data-testid="stSidebarNav"] li:nth-child(5),
+            [data-testid="stSidebarNav"] li:nth-child(6),
+            [data-testid="stSidebarNav"] li:nth-child(7) {
+                display: none;
+            }
+        </style>
+        """
+        
+        st.markdown(hide_pages_css, unsafe_allow_html=True)
+
+# Call this function
+hide_pages_when_not_logged_in()
 
 # --- CUSTOM STYLES ---
 st.markdown("""
